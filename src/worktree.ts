@@ -2,7 +2,6 @@ import {info} from '@actions/core'
 import {ActionInterface} from './constants'
 import {execute} from './execute'
 import {extractErrorMessage, suppressSensitiveInformation} from './util'
-import {execSync} from 'child_process';
 
 export class GitCheckout {
   orphan = false
@@ -12,21 +11,13 @@ export class GitCheckout {
     this.branch = branch
   }
   toString(): string {
-    // Check if the branch is already checked out in another worktree
-    try {
-      execSync(`git rev-parse --verify --quiet ${this.branch}`);
-      // If the command succeeds, the branch is already checked out
-      return `git checkout ${this.branch}`;
-    } catch (error) {
-      // If the command fails, the branch is not checked out
-      return [
-        'git',
-        'checkout',
-        this.orphan ? '--orphan' : '-B',
-        this.branch,
-        this.commitish || ''
-      ].join(' ')
-    }
+    return [
+      'git',
+      'checkout',
+      this.orphan ? '--orphan' : '-B',
+      this.branch,
+      this.commitish || ''
+    ].join(' ')
   }
 }
 
@@ -49,19 +40,11 @@ export async function generateWorktree(
       )
     }
 
-    // Check if the branch is already checked out in another worktree
-    try {
-      execSync(`git rev-parse --verify --quiet ${action.branch}`);
-      // If the command succeeds, the branch is already checked out
-      info(`Branch ${action.branch} is already checked out. Using existing worktree.`)
-    } catch (error) {
-      // If the command fails, the branch is not checked out
-      await execute(
-        `git worktree add --no-checkout --detach ${worktreedir}`,
-        action.workspace,
-        action.silent
-      )
-    }
+    // await execute(
+    //   `git worktree add --no-checkout --detach ${worktreedir}`,
+    //   action.workspace,
+    //   action.silent
+    // )
 
     const checkout = new GitCheckout(action.branch)
 
