@@ -49,11 +49,19 @@ export async function generateWorktree(
       )
     }
 
-    await execute(
-      `git worktree add --no-checkout --detach ${worktreedir}`,
-      action.workspace,
-      action.silent
-    )
+    // Check if the branch is already checked out in another worktree
+    try {
+      execSync(`git rev-parse --verify --quiet ${action.branch}`);
+      // If the command succeeds, the branch is already checked out
+      info(`Branch ${action.branch} is already checked out. Using existing worktree.`)
+    } catch (error) {
+      // If the command fails, the branch is not checked out
+      await execute(
+        `git worktree add --no-checkout --detach ${worktreedir}`,
+        action.workspace,
+        action.silent
+      )
+    }
 
     const checkout = new GitCheckout(action.branch)
 
