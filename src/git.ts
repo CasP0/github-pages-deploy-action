@@ -25,6 +25,12 @@ export async function init(action: ActionInterface): Promise<void | Error> {
 
     try {
       await execute(
+        `git config --global extensions.worktreeConfig false`,
+        action.workspace,
+        action.silent
+      )
+
+      await execute(
         `git config --global --add safe.directory "${action.workspace}"`,
         action.workspace,
         action.silent
