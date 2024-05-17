@@ -40,13 +40,13 @@ export async function generateWorktree(
       )
     }
 
-    // await execute(
-    //   `git worktree add --no-checkout --detach ${worktreedir}`,
-    //   action.workspace,
-    //   action.silent
-    // )
+    await execute(
+      `git worktree add --no-checkout --detach ${worktreedir}`,
+      action.workspace,
+      action.silent
+    )
 
-    const checkout = new GitCheckout(action.branch)
+    // const checkout = new GitCheckout(action.branch)
 
     if (branchExists) {
       // There's existing data on the branch to check out
