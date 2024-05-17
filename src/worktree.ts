@@ -14,7 +14,7 @@ export class GitCheckout {
     return [
       'git',
       'checkout',
-      this.orphan ? '--orphan' : '-B',
+      '--orphan',
       this.branch,
       this.commitish || ''
     ].join(' ')
@@ -46,7 +46,7 @@ export async function generateWorktree(
       action.silent
     )
 
-    // const checkout = new GitCheckout(action.branch)
+    const checkout = new GitCheckout(action.branch)
 
     if (branchExists) {
       // There's existing data on the branch to check out
