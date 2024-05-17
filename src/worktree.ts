@@ -2,6 +2,7 @@ import {info} from '@actions/core'
 import {ActionInterface} from './constants'
 import {execute} from './execute'
 import {extractErrorMessage, suppressSensitiveInformation} from './util'
+import {execSync} from 'child_process';
 
 export class GitCheckout {
   orphan = false
@@ -11,13 +12,21 @@ export class GitCheckout {
     this.branch = branch
   }
   toString(): string {
-    return [
-      'git',
-      'checkout',
-      this.orphan ? '--orphan' : '-B',
-      this.branch,
-      this.commitish || ''
-    ].join(' ')
+    // Check if the branch is already checked out in another worktree
+    try {
+      execSync(`git rev-parse --verify --quiet ${this.branch}`);
+      // If the command succeeds, the branch is already checked out
+      return `git checkout ${this.branch}`;
+    } catch (error) {
+      // If the command fails, the branch is not checked out
+      return [
+        'git',
+        'checkout',
+        this.orphan ? '--orphan' : '-B',
+        this.branch,
+        this.commitish || ''
+      ].join(' ')
+    }
   }
 }
 
